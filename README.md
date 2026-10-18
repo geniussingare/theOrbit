@@ -1,5 +1,7 @@
 # TheOrbit
 
+## Description
+
 A radial quick menu around your cursor. **Hold the right mouse button** anywhere and a ring of apps and actions opens around the pointer. Move onto an item and **release** to run it. A normal short right-click still opens the usual context menu.
 
 - **Lightweight:** native Rust, no web view. The resident process uses about 16 MB and 0% CPU while idle, and it only does work while the right button is held.
