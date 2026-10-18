@@ -100,3 +100,7 @@ The optional `icon` field takes 1–2 letters and replaces the auto-detected ico
 - Native app icons on Windows and Linux (they currently show monograms).
 - Installers (`.dmg`, `.msi`, `.deb`/AppImage) and code signing.
 - Android (floating bubble) and iOS/iPadOS (in-app orbit), reusing `orbit-core` and `orbit-render`.
+
+## License
+
+Apache License 2.0. See [LICENSE](LICENSE).
