@@ -1,0 +1,11 @@
+[package]
+name = "orbit-render"
+description = "CPU renderer for TheOrbit's ring (tiny-skia), shared by the overlay and settings."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+tiny-skia = { version = "0.12", default-features = false, features = ["std", "simd", "png-format"] }
+ab_glyph = "0.2"
+memmap2 = "0.9"

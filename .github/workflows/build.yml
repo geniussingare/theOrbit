@@ -1,0 +1,50 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Linux build deps
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libgl1-mesa-dev
+
+      - name: Test
+        run: cargo test --workspace
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Bundle (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          scripts/bundle-macos.sh --universal
+          cd target/release/bundle && ditto -c -k --keepParent TheOrbit.app TheOrbit-macos.zip
+
+      - name: Build (Windows / Linux)
+        if: runner.os != 'macOS'
+        run: cargo build --release -p orbit-app -p orbit-settings
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TheOrbit-${{ runner.os }}
+          path: |
+            target/release/bundle/TheOrbit-macos.zip
+            target/release/theorbit.exe
+            target/release/theorbit-settings.exe
+            target/release/theorbit
+            target/release/theorbit-settings
+          if-no-files-found: ignore

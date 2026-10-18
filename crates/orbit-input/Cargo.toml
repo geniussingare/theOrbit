@@ -1,0 +1,20 @@
+[package]
+name = "orbit-input"
+description = "Global right-button long-press detection for TheOrbit (macOS, Windows, Linux/X11)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+log = "0.4"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows = { version = "0.62", features = [
+  "Win32_Foundation",
+  "Win32_System_LibraryLoader",
+  "Win32_UI_Input_KeyboardAndMouse",
+  "Win32_UI_WindowsAndMessaging",
+] }
+
+[target.'cfg(all(unix, not(target_os = "macos"), not(target_os = "android"), not(target_os = "ios")))'.dependencies]
+x11rb = { version = "0.14", features = ["xtest", "xinput"] }

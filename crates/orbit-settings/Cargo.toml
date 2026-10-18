@@ -1,0 +1,21 @@
+[package]
+name = "orbit-settings"
+description = "TheOrbit settings window (native egui, runs only while open)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "theorbit-settings"
+path = "src/main.rs"
+
+[dependencies]
+orbit-core = { path = "../orbit-core" }
+orbit-input = { path = "../orbit-input" }
+orbit-render = { path = "../orbit-render" }
+orbit-sys = { path = "../orbit-sys" }
+eframe = { version = "0.37", default-features = false, features = ["glow", "default_fonts", "x11", "wayland"] }
+rfd = { version = "0.17", default-features = false, features = ["xdg-portal", "pollster"] }
+auto-launch = "0.6"
+open = "5"
+log = "0.4"
