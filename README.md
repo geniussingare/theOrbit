@@ -1,4 +1,22 @@
-# TheOrbit
+<p align="center">
+  <a href="https://theorbit.vercel.app/">
+    <img src="assets/ring.png" alt="The TheOrbit ring with eight items, Safari highlighted" width="300">
+  </a>
+</p>
+
+<h1 align="center">TheOrbit</h1>
+
+<p align="center">
+  A radial quick menu around your cursor.<br>
+  <strong>Hold right-click. Pick. Release.</strong>
+</p>
+
+<p align="center">
+  <a href="https://theorbit.vercel.app/">Website</a> ·
+  <a href="https://theorbit.vercel.app/docs/">Docs</a> ·
+  <a href="https://github.com/geniussingare/theOrbit/releases/latest">Download</a> ·
+  <a href="INSTALL.md">Install guide</a>
+</p>
 
 ## Description
 
@@ -9,6 +27,16 @@ A radial quick menu around your cursor. **Hold the right mouse button** anywhere
 - **Configurable:** apps, websites, files/folders, keyboard shortcuts and shell commands.
 - **Calm motion:** the ring springs open, the highlight glides between items, and the ring swells away when you choose one. A soft tick confirms the choice (optional). All motion follows the OS "Reduce motion" setting.
 
+## Install
+
+| System | Download | Notes |
+| --- | --- | --- |
+| macOS 11+ (Apple silicon and Intel) | [`TheOrbit-0.1.0.dmg`](https://github.com/geniussingare/theOrbit/releases/latest) (or `TheOrbit-macos.zip`) | Menu-bar app. Allow Accessibility access on first run. |
+| Windows | [`TheOrbit-windows.zip`](https://github.com/geniussingare/theOrbit/releases/latest) | No permissions needed. Keep both `.exe` files together. |
+| Linux (X11) | [`TheOrbit-linux.tar.gz`](https://github.com/geniussingare/theOrbit/releases/latest) | Needs an X11 session and a compositor. |
+
+Step-by-step setup, permissions and troubleshooting for each system are in [INSTALL.md](INSTALL.md). To build it yourself, see [Build and run](#build-and-run).
+
 ## How it works
 
 | Gesture | Result |
@@ -18,6 +46,19 @@ A radial quick menu around your cursor. **Hold the right mouse button** anywhere
 | Move onto a segment, then release | Runs that item |
 | Release in the centre | Cancels |
 | Right-drag before the hold delay | Passed through untouched (games, CAD, gestures) |
+
+## Documentation
+
+Full docs are at **<https://theorbit.vercel.app/docs/>**.
+
+| Topic | Page |
+| --- | --- |
+| Install and first run | [Install](https://theorbit.vercel.app/docs/getting-started/install/), [Quickstart](https://theorbit.vercel.app/docs/getting-started/quickstart/) |
+| Gestures and tuning | [Gestures](https://theorbit.vercel.app/docs/usage/gestures/) |
+| Apps, URLs, shortcuts, shell | [Menu items](https://theorbit.vercel.app/docs/usage/items/) |
+| Every setting | [Configuration reference](https://theorbit.vercel.app/docs/reference/configuration/) |
+| How it is built | [Architecture](https://theorbit.vercel.app/docs/reference/architecture/) |
+| Problems | [FAQ and troubleshooting](https://theorbit.vercel.app/docs/faq/) |
 
 ## Project layout
 
@@ -33,6 +74,8 @@ crates/
 assets/icons      app icons (regenerate: cargo run -p orbit-render --example icons -- assets/icons,
                   then iconutil for the .icns)
 scripts/          packaging scripts
+website/          landing page (deployed with Vercel)
+docs/             documentation source (MkDocs Material)
 ```
 
 ## Build and run
@@ -96,6 +139,33 @@ The optional `icon` field takes 1–2 letters and replaces the auto-detected ico
 - **macOS:** TheOrbit needs **Accessibility** access (System Settings → Privacy & Security → Accessibility). The hook starts as soon as access is granted. Builds signed with the local identity from `scripts/create-signing-cert.sh` keep that permission across rebuilds. Ad-hoc builds need it re-granted each time.
 - **Windows:** no permissions needed.
 - **Linux:** needs an **X11** session. Wayland blocks global mouse grabs. A compositor is needed for the ring's transparency. The tray uses StatusNotifierItem (KDE and most desktops; GNOME needs the AppIndicator extension).
+
+## Releasing
+
+Releases are built by GitHub Actions. To publish one:
+
+1. Update `version` in the root `Cargo.toml`.
+2. Tag the commit and push the tag:
+
+   ```sh
+   git tag v0.1.0
+   git push origin v0.1.0
+   ```
+
+3. The `release` workflow builds macOS, Windows and Linux, then attaches `TheOrbit-<version>.dmg`, `TheOrbit-macos.zip`, `TheOrbit-windows.zip` and `TheOrbit-linux.tar.gz` to a new GitHub release with generated notes.
+
+## Website and docs
+
+The website (`website/`) and docs (`docs/`) are deployed by [Vercel](https://vercel.com) every time `main` changes. The build settings are in `vercel.json`: it builds the docs with MkDocs into `/docs/` and serves the landing page at `/`. The `docs` workflow also builds the docs with strict link checking on pull requests, so a broken link is caught before it ships.
+
+To preview the docs locally:
+
+```sh
+pip install -r requirements-docs.txt
+mkdocs serve
+```
+
+The landing page is a single file. Open `website/index.html` in a browser, or serve the folder with `python3 -m http.server -d website`.
 
 ## Roadmap
 
