@@ -1,0 +1,856 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TheOrbit</title>
+<meta name="description" content="TheOrbit is a radial quick menu around your cursor. Hold the right mouse button, move onto an item, release. Free and open source for macOS, Windows and Linux.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F6F4FF">
+<meta property="og:title" content="TheOrbit">
+<meta property="og:description" content="Hold right-click. Pick. Release. A radial quick menu around your cursor.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://theorbit.vercel.app/assets/ring.png">
+<link rel="icon" type="image/png" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&display=swap" rel="stylesheet">
+<script>document.documentElement.className += ' js';</script>
+<style>
+:root {
+  --paper: #f6f4ff;
+  --wash: #ece8ff;
+  --ink: #181723;
+  --muted: #4b4960;
+  --line: #dad5f2;
+  --violet: #5b3fd9;
+  --violet-deep: #4a30bd;
+  --ring-hl: #7859f5;
+  --white: #ffffff;
+  --radius: 14px;
+  --font: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+a { color: var(--violet); text-underline-offset: 0.18em; }
+a:hover { color: var(--violet-deep); }
+:focus-visible { outline: 3px solid var(--ring-hl); outline-offset: 3px; border-radius: 6px; }
+code, pre { font-family: var(--mono); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: 16px; top: -60px; background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 8px; z-index: 100; }
+.skip:focus { top: 12px; }
+
+.wrap { width: min(1120px, 100% - 40px); margin-inline: auto; }
+.section { padding-block: clamp(64px, 9vw, 120px); }
+.section--wash { background: var(--wash); }
+
+h1, h2, h3 { margin: 0; line-height: 1.08; letter-spacing: -0.02em; }
+h1 {
+  font-size: clamp(2.7rem, 6vw, 4.9rem);
+  font-weight: 800;
+  font-stretch: 80%;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+}
+.h1__line { display: block; }
+.nowrap { white-space: nowrap; }
+h2 { font-size: clamp(1.9rem, 3.6vw, 2.7rem); font-weight: 700; font-stretch: 90%; }
+h3 { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.01em; line-height: 1.25; }
+p { margin: 0; }
+.lede { font-size: clamp(1.15rem, 1.7vw, 1.35rem); color: var(--muted); max-width: 34ch; }
+.prose { max-width: 56ch; color: var(--muted); }
+.prose + .prose { margin-top: 1em; }
+
+/* Header */
+.top { padding-block: 18px; }
+.top__row { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.brand { display: inline-flex; align-items: center; gap: 12px; color: var(--ink); text-decoration: none; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; }
+.brand img { width: 40px; height: 40px; border-radius: 10px; }
+.nav { display: flex; align-items: center; gap: 6px; }
+.nav a { color: var(--ink); text-decoration: none; padding: 8px 12px; border-radius: 10px; font-size: 1rem; font-weight: 500; }
+.nav a:hover { background: var(--wash); color: var(--ink); }
+.nav .nav__gh { border: 1.5px solid var(--ink); margin-left: 6px; font-weight: 600; }
+.nav .nav__gh:hover { background: var(--ink); color: #fff; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 52px; padding: 0 24px; border-radius: 14px;
+  font: inherit; font-weight: 700; font-size: 1.05rem; text-decoration: none;
+  border: 2px solid transparent; cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+.btn--primary { background: var(--violet); color: #fff; }
+.btn--primary:hover { background: var(--violet-deep); color: #fff; }
+.btn--quiet { border-color: var(--ink); color: var(--ink); background: transparent; }
+.btn--quiet:hover { background: var(--ink); color: #fff; }
+.btns { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* Hero */
+.hero { padding-block: clamp(28px, 5vw, 64px) clamp(56px, 8vw, 104px); }
+.hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: center;
+}
+.hero__copy > * + * { margin-top: 24px; }
+.hero__copy .btns { margin-top: 32px; }
+.trust { font-size: 1rem; color: var(--muted); }
+
+/* Demo stage */
+.stage {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  min-height: 340px;
+  border-radius: 28px;
+  overflow: hidden;
+  background:
+    radial-gradient(110% 80% at 12% 8%, #f1edff 0%, rgba(241, 237, 255, 0) 55%),
+    radial-gradient(90% 80% at 92% 96%, #7d63f0 0%, rgba(125, 99, 240, 0) 62%),
+    linear-gradient(145deg, #d3caff, #ab97ff);
+  box-shadow: 0 30px 60px -30px rgba(74, 48, 189, 0.55);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  cursor: crosshair;
+}
+.stage:focus-visible { outline-offset: 4px; border-radius: 28px; }
+.win {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 14px;
+  padding: 14px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+.win__dots { display: flex; gap: 6px; margin-bottom: 14px; }
+.win__dots i { width: 9px; height: 9px; border-radius: 50%; background: rgba(24, 23, 35, 0.2); }
+.win__line { height: 8px; border-radius: 4px; background: rgba(24, 23, 35, 0.12); margin-top: 8px; }
+.win--a { left: 7%; top: 8%; width: 40%; }
+.win--b { right: 6%; bottom: 9%; width: 46%; }
+.stage__hint {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; gap: 4px; padding: 24px;
+  color: var(--ink);
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.stage__hint strong { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
+.stage__hint span { font-size: 0.95rem; color: rgba(24, 23, 35, 0.72); }
+.stage.is-open .stage__hint { opacity: 0; }
+.stage__fallback { display: none; position: absolute; inset: 0; place-items: center; }
+.stage__fallback img { width: 72%; }
+html:not(.js) .stage__fallback { display: grid; }
+html:not(.js) .stage__hint { display: none; }
+
+.readout {
+  margin-top: 16px;
+  min-height: 3.2em;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+.readout code { background: var(--white); border: 1px solid var(--line); padding: 2px 8px; border-radius: 8px; color: var(--ink); font-size: 0.88rem; }
+
+/* The ring (drawn over the whole page, like the real overlay) */
+.ring {
+  position: fixed; z-index: 60;
+  width: 348px; height: 348px;
+  pointer-events: none;
+  visibility: hidden;
+  filter: drop-shadow(0 12px 26px rgba(24, 23, 35, 0.4));
+}
+.ring svg { display: block; overflow: visible; font-family: var(--font); }
+.ring.is-open { visibility: visible; animation: ring-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.ring.is-choosing { visibility: visible; animation: ring-out 0.22s ease-in both; }
+.ring.is-cancelling { visibility: visible; animation: ring-cancel 0.16s ease-in both; }
+@keyframes ring-in { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+@keyframes ring-out { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(1.18); } }
+@keyframes ring-cancel { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.94); } }
+.ring__seg { fill: rgba(24, 23, 35, 0.92); }
+.ring__hl { fill: var(--ring-hl); opacity: 0; transform-origin: 0 0; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.12s; }
+.ring__hl.is-on { opacity: 1; }
+.ring__hl.is-jump { transition: opacity 0.12s; }
+.ring__center { fill: rgba(14, 13, 24, 0.96); }
+.ring__badge { fill: rgba(255, 255, 255, 0.14); transition: fill 0.12s; }
+.ring__badge.is-on { fill: rgba(255, 255, 255, 0.24); }
+.ring__letter { fill: #fff; font-size: 15px; font-weight: 600; text-anchor: middle; dominant-baseline: central; }
+.ring__label { fill: #aaa8b4; font-size: 11.5px; font-weight: 500; text-anchor: middle; transition: fill 0.12s; }
+.ring__label.is-on { fill: #fff; }
+.ring__title { fill: #fff; font-size: 15px; font-weight: 600; text-anchor: middle; dominant-baseline: central; }
+.ring__title.is-hint { fill: #8d8aa3; font-size: 12px; font-weight: 500; }
+
+/* How it works */
+.how__grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(32px, 6vw, 88px); align-items: center; }
+.steps { list-style: none; counter-reset: step; margin: 36px 0 0; padding: 0; display: grid; gap: 28px; max-width: 46ch; }
+.steps li { counter-increment: step; position: relative; padding-left: 64px; }
+.steps li::before {
+  content: counter(step);
+  position: absolute; left: 0; top: -2px;
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--ink); color: #fff; font-weight: 700; font-size: 1.1rem;
+}
+.steps p { color: var(--muted); margin-top: 4px; }
+.how__art { justify-self: center; width: min(100%, 420px); }
+.how__art figcaption { margin-top: 8px; font-size: 0.95rem; color: var(--muted); text-align: center; }
+.out { margin-top: clamp(48px, 6vw, 72px); max-width: 720px; }
+.out h3 { margin-bottom: 8px; }
+.rows { margin: 0; padding: 0; list-style: none; }
+.rows li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; padding: 14px 0; border-top: 1px solid var(--line); }
+.rows li:last-child { border-bottom: 1px solid var(--line); }
+.rows b { font-weight: 600; }
+.rows span { color: var(--muted); }
+
+/* Config */
+.cfg__grid { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: clamp(32px, 5vw, 72px); align-items: start; }
+.types { margin: 32px 0 0; padding: 0; list-style: none; display: grid; gap: 14px; }
+.types li { display: grid; grid-template-columns: 6.2rem minmax(0, 1fr); gap: 12px; align-items: baseline; }
+.types code { font-size: 0.95rem; background: var(--white); border: 1px solid var(--line); border-radius: 8px; padding: 2px 10px; justify-self: start; color: var(--violet-deep); font-weight: 600; }
+.types span { color: var(--muted); }
+.cfg__more { margin-top: 28px; }
+.code {
+  margin: 0;
+  background: var(--ink);
+  color: #e9e7f7;
+  border-radius: 20px;
+  padding: 24px;
+  overflow-x: auto;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  box-shadow: 0 24px 50px -28px rgba(24, 23, 35, 0.7);
+}
+.code .k { color: #b9a9ff; }
+.code .s { color: #a8e6cf; }
+.code .n { color: #ffd8a6; }
+.code .p { color: #8d8aa3; }
+.code__label { font-family: var(--font); font-size: 0.9rem; color: var(--muted); margin-bottom: 10px; }
+
+/* Light */
+.light__grid { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(32px, 6vw, 88px); align-items: center; }
+.stats { display: flex; gap: clamp(28px, 5vw, 64px); flex-wrap: wrap; }
+.stat b { display: block; font-size: clamp(3.6rem, 8vw, 6rem); font-weight: 800; font-stretch: 78%; line-height: 0.95; letter-spacing: -0.03em; color: var(--violet); }
+.stat span { display: block; margin-top: 8px; color: var(--muted); font-size: 1rem; }
+
+/* Platforms */
+.plat { margin-top: 40px; }
+.plat li { grid-template-columns: 9rem minmax(0, 1fr); }
+.plat li > b { font-size: 1.2rem; font-weight: 700; }
+.plat span { color: var(--muted); }
+.plat a { white-space: nowrap; }
+.plat__note { margin-top: 20px; color: var(--muted); }
+
+/* Download */
+.get__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); align-items: start; }
+.get .btns { margin-top: 28px; }
+.get__src { margin-top: 28px; }
+.get__src .code { font-size: 0.82rem; padding: 20px 22px; }
+
+/* FAQ */
+.faq { max-width: 760px; margin-top: 36px; }
+.faq details { border-top: 1px solid var(--line); padding: 4px 0; }
+.faq details:last-child { border-bottom: 1px solid var(--line); }
+.faq summary {
+  cursor: pointer; list-style: none;
+  font-weight: 600; font-size: 1.15rem; padding: 16px 40px 16px 0; position: relative;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after {
+  content: ""; position: absolute; right: 6px; top: 50%;
+  width: 10px; height: 10px; margin-top: -8px;
+  border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink);
+  transform: rotate(45deg); transition: transform 0.2s;
+}
+.faq details[open] summary::after { transform: rotate(-135deg); margin-top: -2px; }
+.faq details p { color: var(--muted); padding: 0 40px 18px 0; max-width: 60ch; }
+
+/* Closing + footer */
+.close { text-align: left; }
+.close h2 { max-width: 18ch; }
+.close .btns { margin-top: 28px; }
+.foot { background: var(--ink); color: #cfcce6; padding-block: 56px 40px; font-size: 1rem; }
+.foot a { color: #fff; }
+.foot__grid { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr)); gap: 32px; }
+.foot .brand { color: #fff; }
+.foot__tag { margin-top: 14px; max-width: 30ch; color: #b6b3d0; }
+.foot h3 { color: #fff; font-size: 1rem; margin-bottom: 12px; }
+.foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.foot__legal { margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.14); font-size: 0.92rem; color: #b6b3d0; }
+
+@media (max-width: 900px) {
+  .hero__grid, .how__grid, .cfg__grid, .light__grid, .get__grid { grid-template-columns: minmax(0, 1fr); }
+  .how__art { order: -1; width: min(100%, 320px); justify-self: start; }
+  .nav a:not(.nav__gh):not(.nav__docs) { display: none; }
+  .foot__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .foot__grid > :first-child { grid-column: 1 / -1; }
+  .plat li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .rows li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+@media (max-width: 520px) {
+  body { font-size: 1.05rem; }
+  .stage__hint { padding: 24px 20px; }
+  .stage__hint strong { font-size: 1.2rem; }
+  .win--a { width: 46%; }
+  .win--a .win__line:nth-of-type(n + 3) { display: none; }
+  .types li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .btn { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .ring.is-open, .ring.is-choosing, .ring.is-cancelling { animation: none; }
+  .ring__hl, .ring__badge, .ring__label { transition: none; }
+  .faq summary::after { transition: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap top__row">
+    <a class="brand" href="./"><img src="assets/logo-128.png" alt="" width="40" height="40">TheOrbit</a>
+    <nav class="nav" aria-label="Main">
+      <a href="#how">How it works</a>
+      <a href="#config">Make it yours</a>
+      <a href="#platforms">Platforms</a>
+      <a href="#faq">FAQ</a>
+      <a class="nav__docs" href="docs/">Docs</a>
+      <a class="nav__gh" href="https://github.com/geniussingare/theOrbit">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero__grid">
+    <div class="hero__copy">
+      <h1 id="hero-title"><span class="h1__line">Hold <span class="nowrap">right-click.</span></span> <span class="h1__line">Pick.</span> <span class="h1__line">Release.</span></h1>
+      <p class="lede">TheOrbit opens a ring of apps and actions around your cursor. Move onto an item, let go, and it runs.</p>
+      <div class="btns">
+        <a class="btn btn--primary" href="https://github.com/geniussingare/theOrbit/releases/latest" data-dl>Download</a>
+        <a class="btn btn--quiet" href="https://github.com/geniussingare/theOrbit">View source</a>
+      </div>
+      <p class="trust">Free and open source. Runs on macOS, Windows and Linux (X11).</p>
+    </div>
+
+    <div>
+      <div class="stage" id="stage" tabindex="0" role="group" aria-label="Interactive demo of the ring" aria-describedby="demo-help">
+        <div class="win win--a" aria-hidden="true"><div class="win__dots"><i></i><i></i><i></i></div><div class="win__line" style="width:80%"></div><div class="win__line" style="width:60%"></div><div class="win__line" style="width:70%"></div></div>
+        <div class="win win--b" aria-hidden="true"><div class="win__dots"><i></i><i></i><i></i></div><div class="win__line" style="width:90%"></div><div class="win__line" style="width:55%"></div></div>
+        <div class="stage__hint" id="stage-hint" aria-hidden="true">
+          <strong id="hint-title">Press and hold anywhere here</strong>
+          <span id="hint-sub">The real app uses the right mouse button.</span>
+        </div>
+        <div class="stage__fallback"><img src="assets/ring.png" alt="The TheOrbit ring with eight items, Safari highlighted" width="372" height="372"></div>
+      </div>
+      <p class="readout" id="readout" aria-live="polite">Release on an item to see what TheOrbit would run.</p>
+      <p class="sr-only" id="demo-help">Press Enter to open the ring. Use the arrow keys to move between items, Enter to choose one, and Escape to cancel.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section section--wash" id="how" aria-labelledby="how-title">
+  <div class="wrap">
+    <div class="how__grid">
+      <div>
+        <h2 id="how-title">Three moves, no menus to hunt through</h2>
+        <ol class="steps">
+          <li>
+            <h3>Hold the right button</h3>
+            <p>After about a third of a second, the ring opens around your pointer.</p>
+          </li>
+          <li>
+            <h3>Move onto an item</h3>
+            <p>The highlight follows your direction, so you don't have to aim precisely.</p>
+          </li>
+          <li>
+            <h3>Release</h3>
+            <p>The item runs. Let go in the centre to cancel instead.</p>
+          </li>
+        </ol>
+      </div>
+      <figure class="how__art">
+        <img src="assets/ring.png" width="372" height="372" alt="The TheOrbit ring with eight items. Safari is highlighted in violet and its name shows in the centre.">
+        <figcaption>A frame from TheOrbit's own renderer.</figcaption>
+      </figure>
+    </div>
+
+    <div class="out">
+      <h3>It stays out of your way</h3>
+      <ul class="rows">
+        <li><b>You right-click and release quickly</b><span>The normal context menu opens.</span></li>
+        <li><b>You right-drag before the ring opens</b><span>The drag passes through, so games and design tools keep working.</span></li>
+        <li><b>You switch TheOrbit off from the tray</b><span>Every mouse event passes straight through.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="config" aria-labelledby="config-title">
+  <div class="wrap cfg__grid">
+    <div>
+      <h2 id="config-title">Make it yours</h2>
+      <p class="prose" style="margin-top:20px">Fill the ring with the things you reach for every day. Edit it in the settings window, or in one JSON file that TheOrbit reloads when you save.</p>
+      <ul class="types">
+        <li><code>app</code><span>Launch an application.</span></li>
+        <li><code>url</code><span>Open a website.</span></li>
+        <li><code>file</code><span>Open a file or folder.</span></li>
+        <li><code>shortcut</code><span>Press a key combination such as <code style="display:inline;padding:1px 6px">ctrl+alt+t</code>.</span></li>
+        <li><code>shell</code><span>Run a command in the background.</span></li>
+      </ul>
+      <p class="cfg__more"><a href="docs/usage/items/">Read the menu item guide</a></p>
+    </div>
+    <div>
+      <p class="code__label">config.json</p>
+<pre class="code" tabindex="0" aria-label="Example config.json"><code><span class="p">{</span>
+  <span class="k">"holdMs"</span><span class="p">:</span> <span class="n">350</span><span class="p">,</span>
+  <span class="k">"radius"</span><span class="p">:</span> <span class="n">150</span><span class="p">,</span>
+  <span class="k">"sound"</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+  <span class="k">"items"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="k">"title"</span><span class="p">:</span> <span class="s">"Notes"</span><span class="p">,</span> <span class="k">"type"</span><span class="p">:</span> <span class="s">"app"</span><span class="p">,</span> <span class="k">"value"</span><span class="p">:</span> <span class="s">"Notes"</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="k">"title"</span><span class="p">:</span> <span class="s">"Capture"</span><span class="p">,</span> <span class="k">"type"</span><span class="p">:</span> <span class="s">"shortcut"</span><span class="p">,</span> <span class="k">"value"</span><span class="p">:</span> <span class="s">"cmd+shift+4"</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="k">"title"</span><span class="p">:</span> <span class="s">"Docs"</span><span class="p">,</span> <span class="k">"type"</span><span class="p">:</span> <span class="s">"url"</span><span class="p">,</span> <span class="k">"value"</span><span class="p">:</span> <span class="s">"https://docs.rs"</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="k">"title"</span><span class="p">:</span> <span class="s">"Downloads"</span><span class="p">,</span> <span class="k">"type"</span><span class="p">:</span> <span class="s">"file"</span><span class="p">,</span> <span class="k">"value"</span><span class="p">:</span> <span class="s">"~/Downloads"</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="k">"title"</span><span class="p">:</span> <span class="s">"Build"</span><span class="p">,</span> <span class="k">"type"</span><span class="p">:</span> <span class="s">"shell"</span><span class="p">,</span> <span class="k">"value"</span><span class="p">:</span> <span class="s">"make -C ~/code"</span> <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<section class="section section--wash" id="light" aria-labelledby="light-title">
+  <div class="wrap light__grid">
+    <div class="stats" role="group" aria-label="Resource use while idle">
+      <div class="stat"><b>16 MB</b><span>memory while idle</span></div>
+      <div class="stat"><b>0%</b><span>CPU while idle</span></div>
+    </div>
+    <div>
+      <h2 id="light-title">Small enough to forget</h2>
+      <p class="prose" style="margin-top:20px">TheOrbit is native Rust with no web view. It only does work while the right button is held, so it sits in your menu bar or tray without getting in the way.</p>
+      <p class="prose">The motion is calm: the ring springs open, the highlight glides between items, and an optional soft tick confirms your choice. If you turn on Reduce motion in your system, TheOrbit follows it.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="platforms" aria-labelledby="platforms-title">
+  <div class="wrap">
+    <h2 id="platforms-title">Runs where you work</h2>
+    <ul class="rows plat">
+      <li><b>macOS</b><span>macOS 11 or later, on Apple silicon and Intel. A menu-bar app with no Dock icon. It needs Accessibility access to see the right button. <a href="docs/platforms/macos/">macOS setup</a></span></li>
+      <li><b>Windows</b><span>No permissions needed. Run <code>theorbit.exe</code> and look for the tray icon. <a href="docs/platforms/windows/">Windows setup</a></span></li>
+      <li><b>Linux</b><span>Needs an X11 session and a compositor. Wayland blocks global mouse grabs, so it isn't supported there. <a href="docs/platforms/linux/">Linux setup</a></span></li>
+    </ul>
+    <p class="plat__note">Android and iOS are on the roadmap.</p>
+  </div>
+</section>
+
+<section class="section section--wash get" id="download" aria-labelledby="get-title">
+  <div class="wrap get__grid">
+    <div>
+      <h2 id="get-title">Get TheOrbit</h2>
+      <p class="prose" style="margin-top:20px">Download the build for your system, unzip it, and run it. Keep <code>theorbit</code> and <code>theorbit-settings</code> in the same folder.</p>
+      <div class="btns">
+        <a class="btn btn--primary" href="https://github.com/geniussingare/theOrbit/releases/latest" data-dl>Download</a>
+        <a class="btn btn--quiet" href="docs/getting-started/install/">Install guide</a>
+      </div>
+    </div>
+    <div class="get__src">
+      <p class="code__label">Or build it yourself with Rust</p>
+<pre class="code" tabindex="0" aria-label="Build commands"><code><span class="p">$</span> git clone https://github.com/geniussingare/theOrbit.git
+<span class="p">$</span> cd theOrbit
+<span class="p">$</span> cargo build --release -p orbit-app -p orbit-settings
+<span class="p">$</span> ./target/release/theorbit</code></pre>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq" aria-labelledby="faq-title">
+  <div class="wrap">
+    <h2 id="faq-title">Questions</h2>
+    <div class="faq">
+      <details>
+        <summary>Does it replace my right-click menu?</summary>
+        <p>No. A quick right-click opens the normal context menu. The ring only opens when you hold the button. The context menu appears when you release, not when you press.</p>
+      </details>
+      <details>
+        <summary>Will it get in the way of games or design tools?</summary>
+        <p>No. If you move the pointer before the hold delay ends, TheOrbit hands the drag to the app untouched. You can also change the hold delay, or switch TheOrbit off from the tray.</p>
+      </details>
+      <details>
+        <summary>Why does it need Accessibility access on macOS?</summary>
+        <p>macOS only lets an app watch the mouse outside its own windows if you allow it. TheOrbit needs that to notice the right button wherever you are.</p>
+      </details>
+      <details>
+        <summary>Why is Linux limited to X11?</summary>
+        <p>Wayland blocks global mouse grabs, and TheOrbit relies on one to see the right button across every window.</p>
+      </details>
+      <details>
+        <summary>Is shell access safe?</summary>
+        <p>Shell items run with your own permissions, exactly like a script you wrote. TheOrbit only runs what is in your config file, so treat that file like any other script.</p>
+      </details>
+      <details>
+        <summary>Does it collect data?</summary>
+        <p>No. TheOrbit has no account, no analytics and no network code of its own. Your settings stay in a JSON file on your computer.</p>
+      </details>
+      <details>
+        <summary>Is it free?</summary>
+        <p>Yes. TheOrbit is open source under the Apache License 2.0.</p>
+      </details>
+    </div>
+    <p class="prose" style="margin-top:28px">More answers in the <a href="docs/faq/">full FAQ</a>.</p>
+  </div>
+</section>
+
+<section class="section section--wash close" aria-labelledby="close-title">
+  <div class="wrap">
+    <h2 id="close-title">Try it on your own desktop</h2>
+    <div class="btns">
+      <a class="btn btn--primary" href="https://github.com/geniussingare/theOrbit/releases/latest" data-dl>Download</a>
+      <a class="btn btn--quiet" href="https://github.com/geniussingare/theOrbit">Star on GitHub</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <div>
+        <a class="brand" href="./"><img src="assets/logo-128.png" alt="" width="40" height="40">TheOrbit</a>
+        <p class="foot__tag">A radial quick menu around your cursor.</p>
+      </div>
+      <div>
+        <h3>Product</h3>
+        <ul>
+          <li><a href="docs/">Documentation</a></li>
+          <li><a href="https://github.com/geniussingare/theOrbit/releases">Releases</a></li>
+          <li><a href="docs/project/changelog/">Changelog and roadmap</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Project</h3>
+        <ul>
+          <li><a href="https://github.com/geniussingare/theOrbit">Source on GitHub</a></li>
+          <li><a href="https://github.com/geniussingare/theOrbit/issues">Report an issue</a></li>
+          <li><a href="https://github.com/geniussingare/theOrbit/blob/main/LICENSE">Apache License 2.0</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="foot__legal">TheOrbit is free and open source software.</p>
+  </div>
+</footer>
+
+<div class="ring" id="ring" aria-hidden="true"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  // Same defaults as the app (crates/orbit-core/src/config.rs).
+  var ITEMS = [
+    { title: "Finder", type: "app", value: "/System/Library/CoreServices/Finder.app" },
+    { title: "Safari", type: "app", value: "/Applications/Safari.app" },
+    { title: "Terminal", type: "app", value: "/System/Applications/Utilities/Terminal.app" },
+    { title: "Notes", type: "app", value: "/System/Applications/Notes.app" },
+    { title: "Screenshot", type: "shortcut", value: "cmd+shift+4" },
+    { title: "Downloads", type: "file", value: "~/Downloads" },
+    { title: "Settings", type: "app", value: "/System/Applications/System Settings.app" },
+    { title: "Google", type: "url", value: "https://www.google.com" }
+  ];
+  var N = ITEMS.length;
+  var RADIUS = 150, DEAD_ZONE = 42, HOLD_MS = 350, DRAG_THRESHOLD = 8;
+  var R_IN = 54, GAP = 8, R_CENTER = 49.5, R_ICON = 111, LABEL_DY = 37, BADGE_R = 18, HALF = 174;
+  var SPAN = (Math.PI * 2) / N;
+  var NS = "http://www.w3.org/2000/svg";
+
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+
+  // Port of segment_at() in crates/orbit-core/src/geometry.rs: segment 0 at the top, clockwise.
+  function segmentAt(dx, dy, count, dead) {
+    if (!count || Math.hypot(dx, dy) < dead) return -1;
+    var a = Math.atan2(dx, -dy);
+    if (a < 0) a += Math.PI * 2;
+    return Math.floor((a + SPAN / 2) / SPAN) % count;
+  }
+
+  // A point on an edge line that is shifted sideways by d, so neighbouring segments keep a constant gap.
+  function edgePoint(theta, r, d, side) {
+    var t = Math.sqrt(r * r - d * d);
+    var x = t * Math.sin(theta) + d * Math.cos(theta) * side;
+    var y = -t * Math.cos(theta) + d * Math.sin(theta) * side;
+    return x.toFixed(2) + " " + y.toFixed(2);
+  }
+  function wedge(i) {
+    var a0 = i * SPAN - SPAN / 2, a1 = i * SPAN + SPAN / 2, d = GAP / 2;
+    var large = SPAN > Math.PI ? 1 : 0;
+    return "M" + edgePoint(a0, R_IN, d, 1) +
+      " L" + edgePoint(a0, RADIUS, d, 1) +
+      " A" + RADIUS + " " + RADIUS + " 0 " + large + " 1 " + edgePoint(a1, RADIUS, d, -1) +
+      " L" + edgePoint(a1, R_IN, d, -1) +
+      " A" + R_IN + " " + R_IN + " 0 " + large + " 0 " + edgePoint(a0, R_IN, d, 1) + " Z";
+  }
+
+  function el(name, attrs, parent) {
+    var node = document.createElementNS(NS, name);
+    for (var k in attrs) node.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(node);
+    return node;
+  }
+
+  // Build the ring once.
+  var ringBox = document.getElementById("ring");
+  var svg = el("svg", { viewBox: -HALF + " " + -HALF + " " + HALF * 2 + " " + HALF * 2, width: HALF * 2, height: HALF * 2 }, ringBox);
+  var segs = [], badges = [], labels = [];
+  for (var i = 0; i < N; i++) {
+    segs.push(el("path", { d: wedge(i), "class": "ring__seg" }, svg));
+  }
+  var hl = el("path", { d: wedge(0), "class": "ring__hl" }, svg);
+  el("circle", { r: R_CENTER, "class": "ring__center" }, svg);
+  for (var j = 0; j < N; j++) {
+    var th = j * SPAN, cx = R_ICON * Math.sin(th), cy = -R_ICON * Math.cos(th);
+    badges.push(el("circle", { cx: cx.toFixed(2), cy: cy.toFixed(2), r: BADGE_R, "class": "ring__badge" }, svg));
+    var letter = el("text", { x: cx.toFixed(2), y: cy.toFixed(2), "class": "ring__letter" }, svg);
+    letter.textContent = ITEMS[j].title.charAt(0).toUpperCase();
+    var label = el("text", { x: cx.toFixed(2), y: (cy + LABEL_DY).toFixed(2), "class": "ring__label" }, svg);
+    label.textContent = ITEMS[j].title;
+    labels.push(label);
+  }
+  var title = el("text", { x: 0, y: 0, "class": "ring__title" }, svg);
+
+  var stage = document.getElementById("stage");
+  var readout = document.getElementById("readout");
+  var hintTitle = document.getElementById("hint-title");
+  var hintSub = document.getElementById("hint-sub");
+
+  var hover = -1, hlAngle = 0, isOpen = false, hideTimer = 0;
+
+  function setTitle() {
+    if (hover < 0) {
+      title.textContent = "Release to cancel";
+      title.setAttribute("class", "ring__title is-hint");
+    } else {
+      title.textContent = ITEMS[hover].title;
+      title.setAttribute("class", "ring__title");
+    }
+  }
+
+  function setHover(next) {
+    if (next === hover) return;
+    var prev = hover;
+    hover = next;
+    for (var k = 0; k < N; k++) {
+      var on = k === hover;
+      badges[k].classList.toggle("is-on", on);
+      labels[k].classList.toggle("is-on", on);
+    }
+    if (hover < 0) {
+      hl.classList.remove("is-on");
+    } else {
+      // Take the shortest way round so the highlight glides instead of spinning.
+      var target = hover * (360 / N);
+      var turns = Math.round((hlAngle - target) / 360);
+      var angle = target + turns * 360;
+      var jump = prev < 0 || reduced;
+      if (jump) hl.classList.add("is-jump");
+      hlAngle = angle;
+      hl.style.transform = "rotate(" + angle + "deg)";
+      if (jump) { void hl.getBoundingClientRect(); hl.classList.remove("is-jump"); }
+      hl.classList.add("is-on");
+    }
+    setTitle();
+  }
+
+  function resetRing() {
+    ringBox.classList.remove("is-open", "is-choosing", "is-cancelling");
+    hover = -2; // force the next setHover to run
+    setHover(-1);
+  }
+
+  function openRing(x, y) {
+    clearTimeout(hideTimer);
+    resetRing();
+    ringBox.style.left = x - HALF + "px";
+    ringBox.style.top = y - HALF + "px";
+    void ringBox.getBoundingClientRect();
+    ringBox.classList.add("is-open");
+    isOpen = true;
+    stage.classList.add("is-open");
+  }
+
+  // Close the ring: it swells away when an item was chosen and shrinks slightly when cancelled.
+  function hideRing(choice) {
+    if (!isOpen) return;
+    isOpen = false;
+    stage.classList.remove("is-open");
+    ringBox.classList.remove("is-open");
+    ringBox.classList.add(choice >= 0 ? "is-choosing" : "is-cancelling");
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function () {
+      ringBox.classList.remove("is-choosing", "is-cancelling");
+    }, reduced ? 0 : 240);
+  }
+
+  function closeRing(choice) {
+    if (!isOpen) return;
+    hideRing(choice);
+    report(choice);
+  }
+
+  function say(html) { readout.innerHTML = html; }
+  function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function report(choice) {
+    if (choice < 0) {
+      say("Released in the centre, so nothing runs.");
+    } else {
+      var it = ITEMS[choice];
+      say("Released on <strong>" + esc(it.title) + "</strong>. TheOrbit would run <code>" + esc(it.type) + "</code> <code>" + esc(it.value) + "</code>");
+    }
+  }
+
+  // Pointer gesture: the same states as the app's engine (idle, pending, active, passthrough).
+  var pending = null, active = null, timer = 0, autoTimers = [], autoRunning = false;
+
+  function stopAuto() {
+    autoTimers.forEach(clearTimeout);
+    autoTimers = [];
+    if (autoRunning) {
+      autoRunning = false;
+      hideRing(-1);
+      say("Release on an item to see what TheOrbit would run.");
+    }
+  }
+
+  stage.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+
+  stage.addEventListener("pointerdown", function (e) {
+    if (e.pointerType === "mouse" && e.button !== 0 && e.button !== 2) return;
+    stopAuto();
+    if (isOpen) return;
+    e.preventDefault();
+    try { stage.setPointerCapture(e.pointerId); } catch (err) {}
+    pending = { id: e.pointerId, x: e.clientX, y: e.clientY };
+    active = null;
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      if (!pending) return;
+      active = { id: pending.id, x: pending.x, y: pending.y };
+      pending = null;
+      openRing(active.x, active.y);
+    }, HOLD_MS);
+  });
+
+  stage.addEventListener("pointermove", function (e) {
+    if (pending && e.pointerId === pending.id) {
+      if (Math.hypot(e.clientX - pending.x, e.clientY - pending.y) > DRAG_THRESHOLD) {
+        clearTimeout(timer);
+        pending = null;
+        say("You moved before the ring opened, so the drag passes through to the app. Hold still for a third of a second to open it.");
+      }
+    } else if (active && e.pointerId === active.id) {
+      setHover(segmentAt(e.clientX - active.x, e.clientY - active.y, N, DEAD_ZONE));
+    }
+  });
+
+  function release(e, cancelled) {
+    if (pending && e.pointerId === pending.id) {
+      clearTimeout(timer);
+      pending = null;
+      say("A quick press. The real app replays it as a normal right-click, so your usual context menu opens.");
+    } else if (active && e.pointerId === active.id) {
+      var choice = cancelled ? -1 : hover;
+      active = null;
+      closeRing(choice);
+    }
+  }
+  stage.addEventListener("pointerup", function (e) { release(e, false); });
+  stage.addEventListener("pointercancel", function (e) { release(e, true); });
+
+  // Keyboard: Enter opens the ring, arrows move, Enter chooses, Escape cancels.
+  var keyOpen = false;
+  stage.addEventListener("keydown", function (e) {
+    if (e.key === "Tab") return;
+    if (!isOpen && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      stopAuto();
+      var r = stage.getBoundingClientRect();
+      keyOpen = true;
+      openRing(r.left + r.width / 2, r.top + r.height / 2);
+      setHover(0);
+    } else if (isOpen && keyOpen) {
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); setHover((hover + 1) % N); }
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); setHover((hover - 1 + N) % N); }
+      else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); keyOpen = false; closeRing(hover); }
+      else if (e.key === "Escape") { e.preventDefault(); keyOpen = false; closeRing(-1); }
+    }
+  });
+
+  // Touch devices have no right button, so say what to do.
+  if (coarse) {
+    hintTitle.textContent = "Press and hold here";
+    hintSub.textContent = "The real app uses the right mouse button.";
+  } else {
+    hintTitle.textContent = "Hold the mouse button here";
+    hintSub.textContent = "Any button works in this demo. The real app uses the right one.";
+  }
+
+  // One orchestrated moment: play the ring once when the demo scrolls into view.
+  function autoplay() {
+    if (reduced || autoRunning) return;
+    autoRunning = true;
+    var r = stage.getBoundingClientRect();
+    var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    function at(ms, fn) { autoTimers.push(setTimeout(fn, ms)); }
+    at(600, function () { openRing(cx, cy); });
+    at(1100, function () { setHover(1); });
+    at(1500, function () { setHover(2); });
+    at(1900, function () {
+      autoRunning = false;
+      hideRing(2);
+      say("That was the ring. Now press and hold in the panel to try it yourself.");
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    var seen = false;
+    new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting && !seen) { seen = true; obs.disconnect(); setTimeout(autoplay, 300); }
+      });
+    }, { threshold: 0.7 }).observe(stage);
+  } else {
+    setTimeout(autoplay, 800);
+  }
+
+  // Name the visitor's system on the download buttons.
+  var plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "";
+  var ua = navigator.userAgent || "";
+  var os = /mac/i.test(plat) && !/iphone|ipad|ipod/i.test(ua) ? "macOS" : /win/i.test(plat) ? "Windows" : /linux/i.test(plat) && !/android/i.test(ua) ? "Linux" : "";
+  if (os) {
+    var buttons = document.querySelectorAll("[data-dl]");
+    for (var b = 0; b < buttons.length; b++) buttons[b].textContent = "Download for " + os;
+  }
+
+  resetRing();
+})();
+</script>
+</body>
+</html>

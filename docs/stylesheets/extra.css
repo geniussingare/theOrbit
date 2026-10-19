@@ -1,0 +1,39 @@
+/* TheOrbit brand: orbit violet, from the tray icon (#8B72FF). */
+[data-md-color-primary="custom"] {
+  --md-primary-fg-color: #5b45d6;
+  --md-primary-fg-color--light: #8b72ff;
+  --md-primary-fg-color--dark: #3f2fa6;
+  --md-primary-bg-color: #ffffff;
+}
+
+[data-md-color-accent="custom"] {
+  --md-accent-fg-color: #6a4fe8;
+  --md-accent-fg-color--transparent: rgba(106, 79, 232, 0.1);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #17142b;
+  --md-default-bg-color--light: rgba(23, 20, 43, 0.54);
+  --md-default-bg-color--lighter: rgba(23, 20, 43, 0.26);
+  --md-default-bg-color--lightest: rgba(23, 20, 43, 0.07);
+  --md-code-bg-color: #211d3f;
+  --md-typeset-a-color: #a995ff;
+  --md-accent-fg-color: #a995ff;
+  --md-footer-bg-color: #110f22;
+  --md-footer-bg-color--dark: #0d0b1b;
+}
+
+.md-header__button.md-logo img {
+  border-radius: 8px;
+}
+
+.md-typeset .grid.cards > ul > li {
+  border-radius: 12px;
+}
+
+/* The ring is translucent dark, so give it the same violet backdrop as the website. */
+.md-typeset img.ring-hero {
+  background: linear-gradient(145deg, #d3caff, #ab97ff);
+  border-radius: 28px;
+  padding: 20px;
+}
