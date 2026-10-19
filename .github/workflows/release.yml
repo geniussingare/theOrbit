@@ -31,7 +31,11 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           scripts/bundle-macos.sh --universal
-          cd target/release/bundle && ditto -c -k --keepParent TheOrbit.app TheOrbit-macos.zip
+          cd target/release/bundle
+          ditto -c -k --keepParent TheOrbit.app TheOrbit-macos.zip
+          # Disk image with the app and an Applications shortcut, named after the tag (v0.1.0 -> TheOrbit-0.1.0.dmg)
+          mkdir dmg-root && cp -R TheOrbit.app dmg-root/ && ln -s /Applications dmg-root/Applications
+          hdiutil create -volname TheOrbit -srcfolder dmg-root -ov -format UDZO "TheOrbit-${GITHUB_REF_NAME#v}.dmg"
 
       - name: Package (Windows)
         if: runner.os == 'Windows'
@@ -49,7 +53,9 @@ jobs:
         if: runner.os == 'macOS'
         with:
           name: TheOrbit-macos
-          path: target/release/bundle/TheOrbit-macos.zip
+          path: |
+            target/release/bundle/TheOrbit-macos.zip
+            target/release/bundle/TheOrbit-*.dmg
 
       - uses: actions/upload-artifact@v4
         if: runner.os == 'Windows'

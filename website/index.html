@@ -10,7 +10,10 @@
 <meta property="og:title" content="TheOrbit">
 <meta property="og:description" content="Hold right-click. Pick. Release. A radial quick menu around your cursor.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="https://theorbit.vercel.app/assets/ring.png">
+<meta property="og:image" content="https://theorbit.vercel.app/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="assets/favicon-32.png">
 <link rel="apple-touch-icon" href="assets/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -312,6 +315,20 @@ html:not(.js) .stage__hint { display: none; }
   .types li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .btn { width: 100%; }
 }
+/* Promo video */
+.video__head { max-width: 40rem; margin-bottom: 32px; }
+.video__head .prose { margin-top: 14px; }
+.video__frame {
+  border-radius: 24px; overflow: hidden; background: #120f26;
+  box-shadow: 0 30px 60px -30px rgba(24, 23, 35, 0.55);
+  aspect-ratio: 16 / 9;
+}
+.video__frame video { display: block; width: 100%; height: 100%; background: #120f26; }
+.video__text { margin-top: 16px; max-width: 56ch; }
+.video__text summary { cursor: pointer; font-weight: 600; color: var(--violet-deep); }
+.video__text ol { margin: 12px 0 0; padding-left: 1.3em; color: var(--muted); }
+.video__text li + li { margin-top: 4px; }
+.link-video { display: inline-block; margin-top: 4px; font-weight: 600; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .ring.is-open, .ring.is-choosing, .ring.is-cancelling { animation: none; }
@@ -327,6 +344,7 @@ html:not(.js) .stage__hint { display: none; }
   <div class="wrap top__row">
     <a class="brand" href="./"><img src="assets/logo-128.png" alt="" width="40" height="40">TheOrbit</a>
     <nav class="nav" aria-label="Main">
+      <a href="#video">Video</a>
       <a href="#how">How it works</a>
       <a href="#config">Make it yours</a>
       <a href="#platforms">Platforms</a>
@@ -349,6 +367,7 @@ html:not(.js) .stage__hint { display: none; }
         <a class="btn btn--quiet" href="https://github.com/geniussingare/theOrbit">View source</a>
       </div>
       <p class="trust">Free and open source. Runs on macOS, Windows and Linux (X11).</p>
+      <a class="link-video" href="#video">Watch the 24-second video</a>
     </div>
 
     <div>
@@ -364,6 +383,35 @@ html:not(.js) .stage__hint { display: none; }
       <p class="readout" id="readout" aria-live="polite">Release on an item to see what TheOrbit would run.</p>
       <p class="sr-only" id="demo-help">Press Enter to open the ring. Use the arrow keys to move between items, Enter to choose one, and Escape to cancel.</p>
     </div>
+  </div>
+</section>
+
+<section class="section" id="video" aria-labelledby="video-title">
+  <div class="wrap">
+    <div class="video__head">
+      <h2 id="video-title">See it in 24 seconds</h2>
+      <p class="prose">Hold, flick toward an item, release. This is the real app on a Mac.</p>
+    </div>
+    <div class="video__frame">
+      <video controls playsinline preload="none" poster="assets/promo-poster.jpg" aria-describedby="video-text" width="1920" height="1080">
+        <source src="assets/TheOrbit-promo.mp4" type="video/mp4">
+        Your browser can't play this video. <a href="assets/TheOrbit-promo.mp4">Download the MP4</a>.
+      </video>
+    </div>
+    <details class="video__text" id="video-text">
+      <summary>Read what the video shows</summary>
+      <ol>
+        <li>TheOrbit: "Your apps, one hold away."</li>
+        <li>"Hold right-click anywhere": the ring opens around the pointer.</li>
+        <li>Move onto an item and the highlight follows: "Release to launch."</li>
+        <li>"Release in the middle to cancel."</li>
+        <li>"Apps, folders, links, shortcuts" can all sit on the ring.</li>
+        <li>"Native and tiny": pure Rust, no web view, sleeps when idle.</li>
+        <li>"Motion that feels alive": spring physics on every frame.</li>
+        <li>"Everywhere you work": macOS, Windows and Linux.</li>
+        <li>"Hold. Flick. Done." Free for macOS, Windows and Linux.</li>
+      </ol>
+    </details>
   </div>
 </section>
 
@@ -466,7 +514,7 @@ html:not(.js) .stage__hint { display: none; }
   <div class="wrap get__grid">
     <div>
       <h2 id="get-title">Get TheOrbit</h2>
-      <p class="prose" style="margin-top:20px">Download the build for your system, unzip it, and run it. Keep <code>theorbit</code> and <code>theorbit-settings</code> in the same folder.</p>
+      <p class="prose" style="margin-top:20px">On a Mac, open the .dmg and drag TheOrbit to Applications. On Windows and Linux, unzip the download and run it. Keep <code>theorbit</code> and <code>theorbit-settings</code> in the same folder.</p>
       <div class="btns">
         <a class="btn btn--primary" href="https://github.com/geniussingare/theOrbit/releases/latest" data-dl>Download</a>
         <a class="btn btn--quiet" href="docs/getting-started/install/">Install guide</a>

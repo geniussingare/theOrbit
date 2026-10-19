@@ -103,7 +103,7 @@ Releases are built by GitHub Actions when you push a version tag.
     git push origin v0.1.0
     ```
 
-3. The **release** workflow builds macOS, Windows and Linux, then attaches `TheOrbit-macos.zip`, `TheOrbit-windows.zip` and `TheOrbit-linux.tar.gz` to a new GitHub release with generated notes.
+3. The **release** workflow builds macOS, Windows and Linux, then attaches `TheOrbit-<version>.dmg`, `TheOrbit-macos.zip`, `TheOrbit-windows.zip` and `TheOrbit-linux.tar.gz` to a new GitHub release with generated notes.
 
 ## License
 

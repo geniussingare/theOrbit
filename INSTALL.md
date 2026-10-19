@@ -11,8 +11,8 @@ TheOrbit runs on macOS 11 or later, Windows, and Linux with an X11 session. Pick
 
 ## macOS
 
-1. Download `TheOrbit-macos.zip` from the [latest release](https://github.com/geniussingare/theOrbit/releases/latest). It runs on Apple silicon and Intel.
-2. Unzip it and move `TheOrbit.app` to **Applications**.
+1. Download `TheOrbit-0.1.0.dmg` (or `TheOrbit-macos.zip`) from the [latest release](https://github.com/geniussingare/theOrbit/releases/latest). It runs on Apple silicon and Intel.
+2. Open the disk image and drag `TheOrbit.app` to **Applications**. With the zip, unzip it and move the app instead.
 3. Open it. If macOS says it can't verify the developer, Control-click the app, choose **Open**, then confirm. If it still refuses, run:
 
    ```sh

@@ -8,7 +8,7 @@ Get the file for your system from the [latest release](https://github.com/genius
 
 | System | File | What's inside |
 | --- | --- | --- |
-| macOS (Apple silicon and Intel) | `TheOrbit-macos.zip` | `TheOrbit.app`, a menu-bar app |
+| macOS (Apple silicon and Intel) | `TheOrbit-0.1.0.dmg` or `TheOrbit-macos.zip` | `TheOrbit.app`, a menu-bar app |
 | Windows | `TheOrbit-windows.zip` | `theorbit.exe` and `theorbit-settings.exe` |
 | Linux (X11) | `TheOrbit-linux.tar.gz` | `theorbit` and `theorbit-settings` |
 
@@ -21,7 +21,7 @@ Keep both programs in the same folder. TheOrbit starts the settings window from 
 
 === "macOS"
 
-    1. Unzip and move `TheOrbit.app` to **Applications**.
+    1. Open the `.dmg` and drag `TheOrbit.app` to **Applications**. With the zip, unzip it and move the app instead.
     2. Open it. If macOS says it can't verify the developer, Control-click the app, choose **Open**, then confirm.
     3. Allow **Accessibility** access when asked. See [macOS setup](../platforms/macos.md).
 

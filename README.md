@@ -31,7 +31,7 @@ A radial quick menu around your cursor. **Hold the right mouse button** anywhere
 
 | System | Download | Notes |
 | --- | --- | --- |
-| macOS 11+ (Apple silicon and Intel) | [`TheOrbit-macos.zip`](https://github.com/geniussingare/theOrbit/releases/latest) | Menu-bar app. Allow Accessibility access on first run. |
+| macOS 11+ (Apple silicon and Intel) | [`TheOrbit-0.1.0.dmg`](https://github.com/geniussingare/theOrbit/releases/latest) (or `TheOrbit-macos.zip`) | Menu-bar app. Allow Accessibility access on first run. |
 | Windows | [`TheOrbit-windows.zip`](https://github.com/geniussingare/theOrbit/releases/latest) | No permissions needed. Keep both `.exe` files together. |
 | Linux (X11) | [`TheOrbit-linux.tar.gz`](https://github.com/geniussingare/theOrbit/releases/latest) | Needs an X11 session and a compositor. |
 
@@ -152,7 +152,7 @@ Releases are built by GitHub Actions. To publish one:
    git push origin v0.1.0
    ```
 
-3. The `release` workflow builds macOS, Windows and Linux, then attaches `TheOrbit-macos.zip`, `TheOrbit-windows.zip` and `TheOrbit-linux.tar.gz` to a new GitHub release with generated notes.
+3. The `release` workflow builds macOS, Windows and Linux, then attaches `TheOrbit-<version>.dmg`, `TheOrbit-macos.zip`, `TheOrbit-windows.zip` and `TheOrbit-linux.tar.gz` to a new GitHub release with generated notes.
 
 ## Website and docs
 
