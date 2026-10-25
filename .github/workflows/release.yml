@@ -1,0 +1,83 @@
+name: release
+
+# Push a tag such as v0.1.0 to build TheOrbit for macOS, Windows and Linux
+# and attach the downloads to a new GitHub release.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Linux build deps
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libgl1-mesa-dev
+
+      - name: Package (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          scripts/bundle-macos.sh --universal
+          cd target/release/bundle
+          ditto -c -k --keepParent TheOrbit.app TheOrbit-macos.zip
+          # Disk image with the app and an Applications shortcut, named after the tag (v0.1.0 -> TheOrbit-0.1.0.dmg)
+          mkdir dmg-root && cp -R TheOrbit.app dmg-root/ && ln -s /Applications dmg-root/Applications
+          hdiutil create -volname TheOrbit -srcfolder dmg-root -ov -format UDZO "TheOrbit-${GITHUB_REF_NAME#v}.dmg"
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cargo build --release -p orbit-app -p orbit-settings
+          Compress-Archive -Path target/release/theorbit.exe, target/release/theorbit-settings.exe -DestinationPath TheOrbit-windows.zip
+
+      - name: Package (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          cargo build --release -p orbit-app -p orbit-settings
+          tar -czf TheOrbit-linux.tar.gz -C target/release theorbit theorbit-settings
+
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'macOS'
+        with:
+          name: TheOrbit-macos
+          path: |
+            target/release/bundle/TheOrbit-macos.zip
+            target/release/bundle/TheOrbit-*.dmg
+
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Windows'
+        with:
+          name: TheOrbit-windows
+          path: TheOrbit-windows.zip
+
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Linux'
+        with:
+          name: TheOrbit-linux
+          path: TheOrbit-linux.tar.gz
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true

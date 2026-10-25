@@ -1,0 +1,93 @@
+site_name: TheOrbit
+site_description: A radial quick menu around your cursor. Hold right-click, move onto an item, release.
+site_url: https://theorbit.vercel.app/docs/
+repo_url: https://github.com/geniussingare/theOrbit
+repo_name: geniussingare/theOrbit
+edit_uri: edit/main/docs/
+copyright: TheOrbit is open source under the Apache License 2.0
+
+theme:
+  name: material
+  logo: assets/logo.png
+  favicon: assets/favicon.png
+  font:
+    text: Bricolage Grotesque
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - navigation.instant
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+
+extra_css:
+  - stylesheets/extra.css
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/geniussingare/theOrbit
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.keys
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Get started:
+      - Install: getting-started/install.md
+      - Quickstart: getting-started/quickstart.md
+  - Use:
+      - Gestures: usage/gestures.md
+      - Menu items: usage/items.md
+      - Settings and tray: usage/settings.md
+  - Platforms:
+      - macOS: platforms/macos.md
+      - Windows: platforms/windows.md
+      - Linux: platforms/linux.md
+  - Reference:
+      - Configuration: reference/configuration.md
+      - Architecture: reference/architecture.md
+  - Help:
+      - FAQ and troubleshooting: faq.md
+  - Project:
+      - Contributing: project/contributing.md
+      - Changelog and roadmap: project/changelog.md
+  - Website: https://theorbit.vercel.app/
